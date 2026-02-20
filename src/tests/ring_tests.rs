@@ -2,7 +2,6 @@
 mod ring_tests {
     use rug::Integer;
     use safhe_house::math::finite_field::{primitive_nth_root_of_unity, square_root_mod_p};
-    use safhe_house::math::ring::PolyMulAlgorithm;
     use safhe_house::math::ring::{mul, mul_no_mod};
 
     #[test]
@@ -27,40 +26,10 @@ mod ring_tests {
         );
     }
 
-    #[test]
-    fn ring_mul_no_mod_test() {
-        let p = vec![Integer::from(1), Integer::from(3), Integer::from(1), Integer::from(2)];
-        let q = vec![Integer::from(2), Integer::from(1), Integer::from(2), Integer::from(1)];
-
-        assert_eq!(
-            vec![
-                Integer::from(-5), 
-                Integer::from(2), 
-                Integer::from(5), 
-                Integer::from(12)
-            ],
-            mul_no_mod(&p, &q, 4, PolyMulAlgorithm::Fft, 32)
-        );
-    }
+ 
 
     #[test]
-    fn ring_mul_no_mod_test2() {
-        let p = vec![Integer::from(1), Integer::from(2), Integer::from(3), Integer::from(4)];
-        let q = vec![Integer::from(4), Integer::from(3), Integer::from(2), Integer::from(1)];
-
-        assert_eq!(
-            vec![
-                Integer::from(-16), 
-                Integer::from(0), 
-                Integer::from(16), 
-                Integer::from(30)
-            ],
-            mul_no_mod(&p, &q, 4, PolyMulAlgorithm::Fft, 32)
-        );
-    }
-
-    #[test]
-    fn ring_mul_no_mod_test3() {
+    fn ring_mul_karatsuba_test() {
         let p = vec![Integer::from(2), Integer::from(3), Integer::from(1), Integer::from(0), Integer::from(0)];
         let q = vec![Integer::from(1), Integer::from(-1), Integer::from(0), Integer::from(1), Integer::from(0)];
 
@@ -72,7 +41,7 @@ mod ring_tests {
                 Integer::from(1), 
                 Integer::from(3)
             ],
-            mul_no_mod(&p, &q, 5, PolyMulAlgorithm::Karatsuba, 0)
+            mul_no_mod(&p, &q, 5)
         );
     }
 }

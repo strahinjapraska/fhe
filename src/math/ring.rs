@@ -3,18 +3,7 @@ use rand::Rng;
 use rayon::prelude::*;
 use rug::{ops::NegAssign, rand::RandState, Complete, Integer};
 
-use crate::math::{discrete_gaussian::sample_z, polymul::fft::fft_mul, finite_field::{modulo, reduce}, polymul::karatsuba::karatsuba, polymul::ntt::{intt, ntt}, util::random_binary_vector};
-
-use super::polymul::school_book::schoolbook;
-
-
-#[derive(PartialEq)]
-pub enum PolyMulAlgorithm{
-    Default, 
-    Fft, 
-    Karatsuba,  
-    SchoolBook
-}
+use crate::math::{discrete_gaussian::sample_z, finite_field::{modulo, reduce}, polymul::karatsuba::karatsuba, polymul::ntt::{intt, ntt}, util::random_binary_vector};
 
 pub fn mul(a: &Vec<Integer>, b: &Vec<Integer>, p: &Integer, w: &Integer, w_inv: &Integer, phi: &Integer, inv_phi: &Integer) -> Vec<Integer>{
     assert!(a.len() == b.len()); 
@@ -90,47 +79,8 @@ pub fn scalar_mul(s: &Integer, a: &Vec<Integer>, p: &Integer) -> Vec<Integer>{
     }).collect()
 }
 
-
-
-pub fn scalar_div(s: &Integer, a: &Vec<Integer>, p: &Integer) -> Vec<Integer>{
-    a
-    .par_iter()
-    .map(|a_val|{ 
-           if (*a_val < Integer::from(0)) == (s < &Integer::from(0)){
-            modulo(&((a_val + Integer::from(s/2))/s),p)
-           }else{
-            modulo(&((a_val - Integer::from(s/2))/s),p)
-           }
-    }).collect()
-}
-
-pub fn scalar_mul_no_mod(s: &Integer, a: &Vec<Integer>) -> Vec<Integer>{
-    a
-    .par_iter()
-    .map(|a_val|{ 
-        (a_val*s).complete()
-    }).collect()
-}
-
-pub fn scalar_div_no_mod(s: &Integer, a: &Vec<Integer>) -> Vec<Integer>{
-    a
-    .par_iter()
-    .map(|a_val|{ 
-        (a_val/s).complete()
-    }).collect()
-}
-
-
-pub fn mul_no_mod(a: &Vec<Integer>, b:&Vec<Integer>, n: usize, algo: PolyMulAlgorithm, precision: usize) -> Vec<Integer>{
-    let res = if algo == PolyMulAlgorithm::Karatsuba{ 
-        karatsuba(a, b)
-    }else if algo == PolyMulAlgorithm::Fft{
-        fft_mul(a, b, precision)
-    }else if algo == PolyMulAlgorithm::SchoolBook{
-        schoolbook(a, b)
-    }else{
-        karatsuba(a, b)
-    }; 
+pub fn mul_no_mod(a: &Vec<Integer>, b:&Vec<Integer>, n: usize) -> Vec<Integer>{
+    let res = karatsuba(a, b); 
 
     let mut reduced = res[..n].to_vec();
 
@@ -140,7 +90,6 @@ pub fn mul_no_mod(a: &Vec<Integer>, b:&Vec<Integer>, n: usize, algo: PolyMulAlgo
     reduced
 }
 
-
 pub fn add_no_mod(a: &Vec<Integer>, b: &Vec<Integer>) -> Vec<Integer>{
     a
     .par_iter()
@@ -149,35 +98,6 @@ pub fn add_no_mod(a: &Vec<Integer>, b: &Vec<Integer>) -> Vec<Integer>{
         (a_val + b_val).complete()
     }).collect()
 }
-
-pub fn neg_no_mod(a:  &Vec<Integer>) -> Vec<Integer>{
-    a
-    .par_iter()
-    .map(|a_val|{ 
-        (-a_val).complete()
-    }).collect()
-} 
-
-
-pub fn sub_no_mod(a: &Vec<Integer>, b: &Vec<Integer>) -> Vec<Integer>{
-    a
-    .par_iter()
-    .zip(b.par_iter())
-    .map(|(a_val, b_val)|{ 
-        (a_val - b_val).complete()
-    }).collect()
-}
-
-pub fn point_wise_mul_no_mod(a: &Vec<Integer>, b: &Vec<Integer>) -> Vec<Integer>{
-    a
-    .par_iter()
-    .zip(b.par_iter())
-    .map(|(a_val, b_val)|{ 
-        (a_val * b_val).complete()
-    }).collect()
-}
-
-
 
 pub fn uniform_random_element(p: &Integer, n: usize) -> Vec<Integer> {
     // Uniformly sample a random element from Rq

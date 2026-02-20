@@ -1,6 +1,6 @@
 use rayon::prelude::*;
-use rug::Integer; 
-use crate::math::{ring::{add, add_no_mod, mul_no_mod, neg_no_mod, PolyMulAlgorithm}, util::scale};
+use rug::{Integer}; 
+use crate::math::{ring::{add, add_no_mod, mul_no_mod}, util::scale};
 
 use super::{ciphertext::Ciphertext, public_key::PublicKey};
 
@@ -22,9 +22,9 @@ impl PublicKey{
             (lhs.c1.clone(), rhs.c1.clone()),
         ]
         .into_par_iter() 
-        .map(|(a, b)| mul_no_mod(&a, &b, self.params.n, PolyMulAlgorithm::Karatsuba, self.params.precision))
-        .collect();   
-        
+        .map(|(a, b)| mul_no_mod(&a, &b, self.params.n))
+        .collect();       
+
         res[1] = add_no_mod(&res[1], &res[2]); 
         res[2] = res[3].clone(); 
         res.pop();
@@ -39,18 +39,6 @@ impl PublicKey{
         )
     }
 
-    pub fn neg(&self, c: &Ciphertext) -> Ciphertext {
-        let (c0, c1) = rayon::join(
-     || neg_no_mod(&c.c0), 
-     || neg_no_mod(&c.c1)
-        ); 
-        Ciphertext{c0, c1}
-    }
-
-    pub fn sub(&self, lhs: &Ciphertext, rhs: &Ciphertext) -> Ciphertext {
-        let neg_rhs = self.neg(rhs); 
-        self.add(lhs, &neg_rhs)
-    }
 
 
 }

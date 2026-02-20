@@ -1,7 +1,7 @@
 use rand::Rng;
 use rug::Integer;
-
-use super::ring::{scalar_div, scalar_mul_no_mod};
+use crate::math::{finite_field::modulo};
+use rug::Complete;
 
 
 pub fn random_binary_vector(n: usize) -> Vec<Integer>{
@@ -18,7 +18,16 @@ pub fn random_binary_vector(n: usize) -> Vec<Integer>{
 }
 
 pub fn scale(c: &Vec<Integer>, p: &Integer, t: &Integer) -> Vec<Integer>{
-    scalar_div(p, 
-    &scalar_mul_no_mod(t, &c)
-    ,p)
+    let half_p = (p / &Integer::from(2)).complete();
+    c.iter().map(|a| {
+        let tx = (t * a).complete();
+
+        let y = if tx >= 0 {
+            (tx + &half_p) / p
+        } else {
+            (tx - &half_p) / p
+        };
+
+        modulo(&y, p)
+    }).collect()
 }

@@ -1,4 +1,4 @@
-use crate::math::ring::{{add, mul, neg, scalar_mul},{binary_random_element, discrete_gaussian_random_element, uniform_random_element}};
+use crate::math::ring::{add, binary_random_element, discrete_gaussian_random_element, mul, neg, scalar_mul, uniform_random_element};
 
 use super::{ciphertext::Ciphertext, params::Params, plaintext::Plaintext, secret_key::SecretKey};
 use rug::{Complete, Integer};
@@ -20,7 +20,6 @@ impl PublicKey{
         
       
         let b = neg(&add(&mul(&a, &s.secret, &params.p, &params.w, &params.w_inv, &params.phi, &params.phi_inv), &e, &params.p), &params.p);
-      
         let rlk  = PublicKey::gen_rlk(&s);
 
         PublicKey{a, b, params, rlk}

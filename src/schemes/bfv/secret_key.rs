@@ -1,4 +1,4 @@
-use crate::math::ring::{{add, mul, scalar_div}, scalar_mul_no_mod, binary_random_element};
+use crate::math::{ring::{add, binary_random_element, mul}, util::scale};
 
 use super::{ciphertext::Ciphertext, params::Params, plaintext::Plaintext};
 use rug::Integer;
@@ -21,13 +21,14 @@ impl SecretKey{
         let c1 = &ct.c1; 
 
         Plaintext{message: 
-            scalar_div(&self.params.p, 
-                &scalar_mul_no_mod(&self.params.t, 
-                    &add(c0, 
-                        &mul(c1, &self.secret, &self.params.p, &self.params.w, &self.params.w_inv, &self.params.phi, &self.params.phi_inv),
-                        &self.params.p)),
-                         &self.params.t)
+            scale(
+                &add(c0, 
+                &mul(c1, &self.secret, &self.params.p, &self.params.w, &self.params.w_inv, &self.params.phi, &self.params.phi_inv),
+                &self.params.p), 
+            &self.params.p, &self.params.t 
+            )
         }
+
     }
 
 }

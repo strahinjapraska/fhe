@@ -48,13 +48,5 @@ path = "src/tests/schoolbook_tests.rs"
 name = "param_generation"
 path = "src/bin/param_gen.rs"
 
-[[bin]]
-name = "poly_mul_benchmarks" 
-path = "src/bin/benches/poly_mul_benchmarks.rs"
-
-[[bin]]
-name = "scheme_benchmarks" 
-path = "src/bin/benches/scheme_benchmarks.rs"
-
 [profile.release]
 debug = true 

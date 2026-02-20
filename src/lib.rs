@@ -18,8 +18,6 @@ pub mod math{
       
     pub mod polymul{
         pub mod ntt;
-        pub mod fft; 
-        pub mod toom_cook;
         pub mod school_book;
         pub mod karatsuba;
     }
